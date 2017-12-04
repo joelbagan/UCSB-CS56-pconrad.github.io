@@ -11,37 +11,20 @@ free web hosting via a service called "github pages" for sites that are
 * contain only static html, css and javascript.   
 
 All you have to do is change some default settings in your repo. 
-All of this works perfectly for javadoc... at least for public
-repos.
+All of this works perfectly for javadoc.
 
 <div markdown="1" style="float:right; width:780px" >
 ![example of creating private repo](images/create_lab00_javadoc_jgaucho_50.png) 
 </div>
 
-However, if our main repo is private, there's a problem: you can't
-publish to github pages from a private repo.
-
-So, our solution will be to create a separate public repo,
-side-by-side with our private one.  Here's how to do it:
-
-# Step 1: Set up public repo
-
-Set up a public repo with a name that is similar to, but different from the private repo.  You might simply
-add `javadoc` into the name.  For example, if our private repo is `lab00_jgaucho`, we'll create a
-public repo `lab00_javadoc_jgaucho` (as shown in the example at right.)
-
-The repo doesn't need a `.gitignore`, but do give it a `README.md` to make it easier to clone.  
-
-<div style="clear:both;">&nbsp;</div>
-
-# Step 2: Make master branch your Github pages source
+# Step 1: Make master branch /docs folder your Github pages source
 
 <div style="clear:both;" />
 <div markdown="1" style="float:right; width:780px;" >
 ![Select master on dropdown](images/github_pages_box.png)
 </div>
 
-Next, we'll set up the public repo to publish to the web.
+First, we'll set up the repo to publish to the web.
 
 This involves changing some settings in your repo. 
 
@@ -49,17 +32,19 @@ This involves changing some settings in your repo.
 
 (b) Click on it, and scroll down to the "GitHub Pages" section
 
-(c) Click on the dropdown box under "Source" and select `master` as the branch for GitHub pages.
+(c) Click on the dropdown box under "Source" and select `master branch /docs folder` as the source for GitHub pages.
 
 (d) Click "Save" and the page should reload. 
 
-# Step 3: Test it out with some web content.
+What this is doing is telling GitHub pages to look in a folder called `/docs` at the top level of the `master` branch for content to display. 
 
-To see if it is working, we can put a small test file, `hello.html` in the public repo on the master
-branch.
+# Step 2: Test it out with some web content.
+
+To see if it is working, we can put a small test file, `hello.html` in the `/docs` folder in the repo on the master
+branch. If the `/docs` folder does not exist, create it, and `git add /docs` to add it to your repo, and `git push origin master` to push the changes to GitHub.
 
 Here is a minimalist (yet still 100% HTML 5 standards compliant) `hello.html` file.   Create this
-in the master branch of the repo (you can do this directly in the github.com interface by clicking on "Create File",
+in the `/docs` folder on the master branch of the repo (you can do this directly in the github.com interface by clicking on "Create File",
 and copy/pasting in this content:
 
 <div markdown="1" style="float:right; width:780px; clear:both;" >
@@ -82,10 +67,10 @@ and copy/pasting in this content:
 Once you have committed this file your repo on the master branch, you should be able to navigate to
 this web address to see the content, as shown at right.
 
-* If the repo is <http://github.com/UCSB-CS56-F17/lab00_javadoc_jgaucho>, the web content will be at
-  <http://UCSB-CS56-F17.github.io/lab00_javadoc_jgaucho>.   
+* If the repo is <http://github.com/UCSB-CS56-F17/lab00_jgaucho>, the web content will be at
+  <http://UCSB-CS56-F17.github.io/lab00_jgaucho>.   
 * So to bring up the hello.html file, enter
-  this in your browser: <http://UCSB-CS56-F17.github.io/lab00_javadoc_jgaucho/hello.html>.  You should
+  this in your browser: <http://UCSB-CS56-F17.github.io/lab00_jgaucho/hello.html>.  You should
   see your web page.  To make sure that it is yours you are seeing ( and not mine), modify the content
   (change it from `Hello, World!`, to `Hello, Kitty!`, or `Hello, Dr. Nick!`, or whatever.)
 
@@ -97,42 +82,7 @@ set up our ant build.xml file to copy content into that repo.
 
 <div style="clear:both;" />
 
-# Step 4: Clone the public repo as a *sibling* of the private repo
-
-To simplify the steps of publishing, we'll put the two repos
-*side-by-side* in the same parent directory.  This *side-by-side* part
-is *crucial*, so read these instructions carefully
-
-* You need to clone them both in the same parent directory (e.g. `~/cs56`, or `/Users/JoGaucho/github`, or whatever)
-* You should see the two directories/folders side by side in the same parent directory/folder
-* That way, we can use a relative path from with the private repo's directory  to access the public repo's files, for example, `../lab00_javadoc_jgaucho` as we demonstrate in the next step.
-
-Here's what that should look like. 
-
-```
--bash-4.3$ pwd
-/cs/faculty/pconrad/cs56
--bash-4.3$ ls
-lab00_jgaucho
--bash-4.3$ git clone git@github.com:UCSB-CS56-M16/lab00_javadoc_jgaucho.git
-Cloning into 'lab00_javadoc_jgaucho'...
-remote: Counting objects: 6, done.
-remote: Compressing objects: 100% (4/4), done.
-remote: Total 6 (delta 0), reused 0 (delta 0), pack-reused 0
-Receiving objects: 100% (6/6), done.
-Checking connectivity... done.
--bash-4.3$ ls
-lab00_javadoc_jgaucho  lab00_jgaucho
--bash-4.3$ cd lab00_javadoc_jgaucho/
--bash-4.3$ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
-nothing to commit, working directory clean
--bash-4.3$ 
-```
-
-
-# Step 5: Modify `javadoc` target in private repo 
+# Step 3: Modify `javadoc` target in private repo 
 
 In this step, we add a `property` definiton to your `build.xml` that
 defines a property called `javadoc_dest`.
@@ -189,9 +139,9 @@ After:
 ``` xml
 <target name="javadoc" depends="compile" description="generate javadoc">
     <delete quiet="true">
-      <fileset dir="javadoc" />
+      <fileset dir="docs" />
     </delete>
-    <javadoc destdir="javadoc">
+    <javadoc destdir="docs">
       <fileset dir="src" >
 	      <include name="*.java"/>
       </fileset>
@@ -199,45 +149,20 @@ After:
       <link href="https://docs.oracle.com/javase/8/docs/api/" />          
     </javadoc>
     <echo>                                                                                       
-      javadoc written to file://${javadoc_path}/index.html                              
-      copying to ${public_javadoc_path}/index.html                                      
-    </echo>                                                                                      
-    <delete quiet="true">                                                                        
-      <fileset dir="${public_javadoc_path}" />                                          
-    </delete>                                                                                    
-    <mkdir dir="${public_javadoc_path}" />                                              
-    <copy todir="${public_javadoc_path}">                                               
-      <fileset dir="javadoc" />                                                                  
-    </copy>                                                                                      
-    <echo>                                                                                       
-      javadoc copied to ${public_javadoc_path}/index.html                               
-      TO PUBLISH: cd into that repo, then git add javadoc;                                       
-        git commit -m "update javadoc"; git push origin master                               
-    </echo>                                                                                     
+      javadoc written to file://${javadoc_path}/index.html                                                                   
+    </echo>
   </target>     
 
 ```
 
-Now, when we run `ant javadoc`, we should see that the javadoc is copied to the sibling public repo.
+Now, when we run `ant javadoc`, we should see that the javadoc is written to the `/docs` folder.
 
-In that repo, if we do our usual workflow, we should be able to publish these changes online:
-
-``` 
-  git status
-  git add javadoc
-  git status
-  git commit -m "update javadoc"
-  git push origin master
-```
+Now, run `git status` to see if the `/docs` folder and its contents are being tracked, and if they are not, be sure to run `git add /docs` to track them, and commit and push the changes.
 
 Once you've done this, visit this link (modifying as needed) to see the published javadoc:
 
-`http://UCSB-CS56-M16.github.io/lab00_javadoc_jgaucho/javadoc/index.html`
+`http://UCSB-CS56-M16.github.io/lab00_jgaucho/javadoc/index.html`
+
+If you have trouble with the link, try navigating back to the settings page of your repo where you configured the GitHub pages source. There should be a green box under the Github Pages header with a link to your published repo.
 
 If you have difficulties, ask your mentor/TA/instructor during lab, or post questions to Piazza.
-
-
-
-
-
-
